@@ -1,8 +1,16 @@
-class WatchList {
+import scala.collection.mutable.ListBuffer
 
-  val watchList: List[String] = ???
+case class WatchList() {
+
+  lazy val watchList: ListBuffer[String] = new ListBuffer[String]
 
 
+  def addContentIDs(contentID: String):Unit = {
+    watchList += contentID
+  }
 
+  def getContentIDs(): List[String] = {
+    watchList.toList
+  }
 }
 
