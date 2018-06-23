@@ -12,5 +12,11 @@ case class WatchList() {
   def getContentIDs(): List[String] = {
     watchList.toList
   }
+
+  def deleteContentID(contentID: String) = {
+    if(watchList.contains(contentID)){
+      watchList -= contentID
+    }
+  }
 }
 
