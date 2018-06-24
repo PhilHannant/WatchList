@@ -7,7 +7,7 @@ import akka.util.Timeout
 import akka.pattern.ask
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.collection.mutable.ListBuffer
+
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.concurrent.{Await, ExecutionContext, Future, duration}
@@ -19,15 +19,25 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
   implicit val timeout = Timeout(5 seconds)
 
 
-  val bmActorRef: ActorRef = customerRegisterActor
+  val crActorRef: ActorRef = customerRegisterActor
 
   "addConetent" should "add content for a customer and return an ActionPerformed" in {
-    val addContent = bmActorRef ? AddContentID("123", "zRE49")
+    val addContent = crActorRef ? AddContentID("123", "zRE49")
     val result = Await.result(addContent, timeout.duration)
     println(result)
     result should be (ActionPerformed(s"Customer zRE49 added."))
   }
 
-
+  "getWatchList" should "return a list of watchItems" in {
+    crActorRef ? AddContentID("123", "zRE49")
+    crActorRef ? AddContentID("123", "wYqiZ")
+    crActorRef ? AddContentID("123", "15nW5")
+    crActorRef ? AddContentID("123", "srT5k")
+    crActorRef ? AddContentID("123", "FBSxr")
+    val watchList = crActorRef ? GetWatchList("123")
+    val result = Await.result(watchList, timeout.duration)
+    println(result)
+    result should be (CustomerWatchList(List("zRE49", "wYqiZ", "15nW5", "srT5k", "FBSxr")))
+  }
 
 }
