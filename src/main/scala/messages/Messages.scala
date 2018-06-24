@@ -1,11 +1,15 @@
 package messages
 
+import actors.Customer
+
 sealed trait Messages
-case class ActionPerformed(description: String)
-case class GetWatchList(customer: String)
-case class AddContentID(customer: String, contentID: String)
-case class GetUser(name: String)
-case class DeleteContentID(customer: String, contentID: String)
-case class CustomerWatchList(contentIDs: List[String])
+case class ActionPerformed(description: String) extends Messages
+case class GetWatchList(customer: String) extends Messages
+case class AddContentID(customer: String, contentID: String) extends Messages
+case class GetUser(name: String) extends Messages
+case class DeleteContentID(customer: String, contentID: String) extends Messages
+case class CustomerWatchList(contentIDs: List[String]) extends Messages
+case class AddAllContentIDs(customer: Customer) extends Messages
+
 
 
