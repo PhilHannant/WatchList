@@ -21,7 +21,7 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
 
   "CustomerRoutes" should {
     "return no users if no present (GET /customers)" in {
-      val request = HttpRequest(uri = "/customers/...")
+      val request = HttpRequest(uri = "/customers")
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
