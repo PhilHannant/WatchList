@@ -28,4 +28,6 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
     result should be (ActionPerformed(s"Customer zRE49 added."))
   }
 
+
+
 }
