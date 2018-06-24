@@ -20,8 +20,10 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
   lazy val routes = customerRoutes
 
   "CustomerRoutes" should {
-    "return no users if no present (GET /customers)" in {
-      val request = HttpRequest(uri = "/customers")
+    "return no content if no present (GET /customers)" in {
+      val customer = Customer("123", List())
+      val customerEntity = Marshal(customer).to[MessageEntity].futureValue
+      val request = HttpRequest(uri = "/customers").withEntity(customerEntity)
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
@@ -37,8 +39,8 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
     val customer = Customer("123", List("zRE49", "wYqiZ", "srT5k", "FBSxr"))
     val customerEntity = Marshal(customer).to[MessageEntity].futureValue
 
-    println(customerEntity)
     val request = Post("/customers").withEntity(customerEntity)
+    println(request)
 
     request ~> routes ~> check {
       status should ===(StatusCodes.Created)

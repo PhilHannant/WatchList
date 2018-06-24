@@ -41,9 +41,13 @@ trait CustomerRoutes extends JsonSupport {
         pathEnd {
           concat(
             get {
-              val customer: Future[CustomerWatchList] =
-                (customerRegisterActor ? GetWatchList(pathEnd.toString)).mapTo[CustomerWatchList]
-              complete(customer)
+              entity(as[Customer]) { c =>
+                val customer: Future[CustomerWatchList] =
+                  (customerRegisterActor ? GetWatchList(c.customerID)).mapTo[CustomerWatchList]
+                onSuccess(customer) { performed =>
+                  complete((StatusCodes.OK, performed))
+                }
+              }
             },
             post {
               entity(as[Customer]) { customer =>

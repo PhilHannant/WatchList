@@ -13,6 +13,7 @@ case class Customer(customerID: String, contentIDs: List[String])
 case class CustomerContent(customerID: String, contentID: String)
 
 
+
 object CustomerRegisterActor {
   def props: Props = Props[CustomerRegisterActor]
 }
@@ -25,7 +26,8 @@ class CustomerRegisterActor extends Actor with ActorLogging {
 
   def receive: Receive = {
     case GetWatchList(customer) =>
-      if(customers.isEmpty) sender() ! CustomerWatchList(List.empty)
+      println(customer)
+      if(customers.isEmpty){ println("empty"); sender() ! CustomerWatchList(List.empty)}
       else sender() ! CustomerWatchList(customers.find(c => c.customerID == customer).get.contentIDs)
     case AddContentID(customer, contentID) =>
       if(customers.map(_.customerID).contains(customer)){
