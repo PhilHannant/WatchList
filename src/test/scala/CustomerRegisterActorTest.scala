@@ -40,4 +40,18 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
     result should be (CustomerWatchList(List("zRE49", "wYqiZ", "15nW5", "srT5k", "FBSxr")))
   }
 
+  "deleteContentID" should "remove a contentId from a customer's watchlist" in {
+    crActorRef ? AddContentID("123", "zRE49")
+    crActorRef ? AddContentID("123", "wYqiZ")
+    crActorRef ? AddContentID("123", "15nW5")
+    crActorRef ? AddContentID("123", "srT5k")
+    crActorRef ? AddContentID("123", "FBSxr")
+    crActorRef ? DeleteContentID("123", "15nW5")
+    val watchList = crActorRef ? GetWatchList("123")
+    val result = Await.result(watchList, timeout.duration)
+    println(result)
+    result should be (CustomerWatchList(List("zRE49", "wYqiZ", "srT5k", "FBSxr")))
+
+  }
+
 }

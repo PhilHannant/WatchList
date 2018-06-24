@@ -6,7 +6,7 @@ import akka.event.Logging
 
 import scala.concurrent.duration._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{ContentTypes, StatusCodes}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.delete
 import akka.http.scaladsl.server.directives.MethodDirectives.get
@@ -36,30 +36,47 @@ trait CustomerRoutes extends JsonSupport {
 
 
   lazy val customerRoutes: Route =
-  pathPrefix("customers") {
-    concat(
-      pathEnd {
-        concat(
-          get {
-            val customer: Future[Customer] =
-              (customerRegisterActor ? GetWatchList).mapTo[Customer]
-            complete(customer)
-          },
-          post {
-            entity(as[Customer]) { customer =>
-              val addContentID: Future[ActionPerformed] =
-                (customerRegisterActor ? AddAllContentIDs(customer)).mapTo[ActionPerformed]
-              onSuccess(addContentID) { performed =>
-                log.info("Created user [{}]: {}", customer, performed.description)
-                complete((StatusCodes.Created, performed))
+    pathPrefix("customers") {
+      concat(
+        path(Segment) { customerID =>
+          concat(
+            get {
+              val customer: Future[CustomerWatchList] =
+                (customerRegisterActor ? GetWatchList(customerID)).mapTo[CustomerWatchList]
+              complete(customer)
+            },
+            post {
+              entity(as[Customer]) { customer =>
+                val addContentID: Future[ActionPerformed] =
+                  (customerRegisterActor ? AddAllContentIDs(customer)).mapTo[ActionPerformed]
+                onSuccess(addContentID) { performed =>
+                  log.info("Created user [{}]: {}", customer, performed.description)
+                  complete((StatusCodes.Created, performed))
+                }
               }
             }
-          }
-        )
-      }
+          )
+        },
+        path(Segment) { customerID =>
+          concat(
+            get {
+              val maybeUser: Future[Option[CustomerWatchList]] =
+                (customerRegisterActor ? GetUser(customerID)).mapTo[Option[CustomerWatchList]]
+              rejectEmptyResponse {
+                complete(maybeUser)
+              }
+            },
+            delete {
+              val userDeleted: Future[ActionPerformed] =
+                (customerRegisterActor ? DeleteContentID(customerID, "srT5k")).mapTo[ActionPerformed]
+              onSuccess(userDeleted) { performed =>
+                log.info("Deleted user [{}]: {}", customerID, performed.description)
+                complete((StatusCodes.OK, performed))
+              }
+            }
+          )
+        }
+      )
 
-    )
-
-  }
-
+    }
 }

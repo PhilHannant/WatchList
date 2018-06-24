@@ -21,16 +21,13 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
 
   "CustomerRoutes" should {
     "return no users if no present (GET /customers)" in {
-      // note that there's no need for the host part in the uri:
-      val request = HttpRequest(uri = "/customers")
+      val request = HttpRequest(uri = "/customers/...")
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
 
-        // we expect the response to be json:
         contentType should ===(ContentTypes.`application/json`)
 
-        // and no entries should be in the list:
         entityAs[String] should ===("""{"contentIDs":[]}""")
       }
     }
@@ -38,23 +35,32 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
 
   "be able to add users (POST /customers)" in {
     val customer = Customer("123", List("zRE49", "wYqiZ", "srT5k", "FBSxr"))
-    val customerEntity = Marshal(customer).to[MessageEntity].futureValue // futureValue is from ScalaFutures
+    val customerEntity = Marshal(customer).to[MessageEntity].futureValue
 
     println(customerEntity)
-    // using the RequestBuilding DSL:
     val request = Post("/customers").withEntity(customerEntity)
 
     request ~> routes ~> check {
       status should ===(StatusCodes.Created)
 
+      contentType should ===(ContentTypes.`application/json`)
+
+      entityAs[String] should ===("""{"description":"Customer Customer(123,List(zRE49, wYqiZ, srT5k, FBSxr)) added."}""")
+    }
+  }
+
+  "be able to remove a customrs contentID (DELETE /users)" in {
+    val request = Delete(uri = "/customers/123")
+
+    request ~> routes ~> check {
+      status should ===(StatusCodes.OK)
 
       // we expect the response to be json:
       contentType should ===(ContentTypes.`application/json`)
 
-      // and we know what message we're expecting back:
-      entityAs[String] should ===("""{"description":"Customer Customer(123,List(zRE49, wYqiZ, srT5k, FBSxr)) added."}""")
+      // and no entries should be in the list:
+      entityAs[String] should ===("""{"description":"User Kapi deleted."}""")
     }
-
   }
 
 
