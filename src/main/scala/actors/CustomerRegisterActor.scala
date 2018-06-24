@@ -10,6 +10,7 @@ import scala.collection.mutable.ListBuffer
 
 
 case class Customer(customerID: String, contentIDs: List[String])
+case class CustomerContent(customerID: String, contentID: String)
 
 
 object CustomerRegisterActor {

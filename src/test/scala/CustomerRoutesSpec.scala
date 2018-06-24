@@ -1,4 +1,4 @@
-import actors.{Customer, CustomerRegisterActor}
+import actors.{Customer, CustomerContent, CustomerRegisterActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
@@ -49,8 +49,10 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
     }
   }
 
-  "be able to remove a customrs contentID (DELETE /users)" in {
-    val request = Delete(uri = "/customers/123")
+  "be able to remove a customrs contentID (DELETE /customers)" in {
+    val customer = CustomerContent("123", "srT5k")
+    val customerEntity = Marshal(customer).to[MessageEntity].futureValue
+    val request = Delete(uri = "/customers").withEntity(customerEntity)
 
     request ~> routes ~> check {
       status should ===(StatusCodes.OK)

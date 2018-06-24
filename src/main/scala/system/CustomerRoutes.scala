@@ -1,6 +1,6 @@
 package system
 
-import actors.Customer
+import actors.{Customer, CustomerContent}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.event.Logging
 
@@ -50,31 +50,33 @@ trait CustomerRoutes extends JsonSupport {
                 val addContentID: Future[ActionPerformed] =
                   (customerRegisterActor ? AddAllContentIDs(customer)).mapTo[ActionPerformed]
                 onSuccess(addContentID) { performed =>
-                  log.info("Created user [{}]: {}", customer, performed.description)
+                  log.info("Created customer content [{}]: {}", customer, performed.description)
                   complete((StatusCodes.Created, performed))
                 }
               }
             }
           )
         },
-        path(Segment) { customerID =>
-          concat(
-            get {
-              val maybeUser: Future[Option[CustomerWatchList]] =
-                (customerRegisterActor ? GetUser(customerID)).mapTo[Option[CustomerWatchList]]
-              rejectEmptyResponse {
-                complete(maybeUser)
+        pathEnd {
+            concat(
+              get {
+                val maybeUser: Future[Option[CustomerWatchList]] =
+                  (customerRegisterActor ? GetUser(pathEnd.toString)).mapTo[Option[CustomerWatchList]]
+                rejectEmptyResponse {
+                  complete(maybeUser)
+                }
+              },
+              delete {
+                entity(as[CustomerContent]) { cc =>
+                  val contentDeleted: Future[ActionPerformed] =
+                    (customerRegisterActor ? DeleteContentID(cc.customerID, cc.contentID)).mapTo[ActionPerformed]
+                  onSuccess(contentDeleted) { performed =>
+                    log.info("Deleted content [{}]: {}", cc, performed.description)
+                    complete((StatusCodes.OK, performed))
+                  }
+                }
               }
-            },
-            delete {
-              val userDeleted: Future[ActionPerformed] =
-                (customerRegisterActor ? DeleteContentID(customerID, "srT5k")).mapTo[ActionPerformed]
-              onSuccess(userDeleted) { performed =>
-                log.info("Deleted user [{}]: {}", customerID, performed.description)
-                complete((StatusCodes.OK, performed))
-              }
-            }
-          )
+            )
         }
       )
 
