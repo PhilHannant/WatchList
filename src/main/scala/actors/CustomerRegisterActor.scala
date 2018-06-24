@@ -24,9 +24,9 @@ class CustomerRegisterActor extends Actor with ActorLogging {
 
   def receive: Receive = {
     case GetWatchList(customer) =>
-      sender() ! customers.find(c => c.customerID == customer).get.contentIDs
+      sender() ! CustomerWatchList(customers.find(c => c.customerID == customer).get.contentIDs)
     case AddContentID(customer, contentID) =>
-      if(customers.contains(customer)){
+      if(customers.map(_.customerID).contains(customer)){
         val c = customers.find(c => c.customerID == customer).get
         val update = c.copy(customer, c.contentIDs ::: List(contentID))
         customers -= customers.find(c => c.customerID == customer).get
@@ -37,9 +37,12 @@ class CustomerRegisterActor extends Actor with ActorLogging {
       sender() ! ActionPerformed(s"Customer ${contentID} added.")
     case GetUser(customer) =>
       sender() ! customers.find(_ == customer)
-//    case DeleteContentID(customer, contentID) =>
-//      customers.put(customer, customers.get(customer).filter(cID => cID != contentID).get)
-//      sender() ! ActionPerformed(s"Customer ${contentID} deleted.")
+    case DeleteContentID(customer, contentID) =>
+      val c = customers.find(c => c.customerID == customer).get
+      val remove = c.copy(customer, c.contentIDs.filter(c => c != contentID))
+      customers -= customers.find(c => c.customerID == customer).get
+      customers += remove
+      sender() ! ActionPerformed(s"Customer ${contentID} deleted.")
   }
 
 
