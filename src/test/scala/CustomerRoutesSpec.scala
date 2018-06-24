@@ -59,7 +59,7 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
       contentType should ===(ContentTypes.`application/json`)
 
       // and no entries should be in the list:
-      entityAs[String] should ===("""{"description":"User Kapi deleted."}""")
+      entityAs[String] should ===("""{"description":"ContentID: srT5k deleted."}""")
     }
   }
 

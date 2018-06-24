@@ -38,11 +38,11 @@ trait CustomerRoutes extends JsonSupport {
   lazy val customerRoutes: Route =
     pathPrefix("customers") {
       concat(
-        path(Segment) { customerID =>
+        pathEnd {
           concat(
             get {
               val customer: Future[CustomerWatchList] =
-                (customerRegisterActor ? GetWatchList(customerID)).mapTo[CustomerWatchList]
+                (customerRegisterActor ? GetWatchList(pathEnd.toString)).mapTo[CustomerWatchList]
               complete(customer)
             },
             post {

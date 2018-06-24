@@ -48,7 +48,8 @@ class CustomerRegisterActor extends Actor with ActorLogging {
         val remove = c.copy(customer, c.contentIDs.filter(c => c != contentID))
         customers -= customers.find(c => c.customerID == customer).get
         customers += remove
-        sender() ! ActionPerformed(s"Customer ${contentID} deleted.")
+        println(customers.toList)
+        sender() ! ActionPerformed(s"ContentID: ${contentID} deleted.")
       }
       else sender() ! ActionPerformed(s"No $customer content found.")
   }
