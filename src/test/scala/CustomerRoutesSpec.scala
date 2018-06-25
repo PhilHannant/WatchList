@@ -33,57 +33,109 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
         entityAs[String] should ===("""{"contentIDs":[]}""")
       }
     }
-  }
 
-  "be able to add customerContentID (POST /customers)" in {
-    val customer = CustomerContent("abc", "zRE49")
-    val customerEntity = Marshal(customer).to[MessageEntity].futureValue
 
-    val request = Post("/customers").withEntity(customerEntity)
-    println(request)
+    "be able to add customerContentID (POST /customers)" in {
+      val customer = CustomerContent("xyz", "zRE49")
+      val customerEntity = Marshal(customer).to[MessageEntity].futureValue
 
-    request ~> routes ~> check {
-      status should ===(StatusCodes.Created)
+      val request = Post("/customers").withEntity(customerEntity)
 
-      contentType should ===(ContentTypes.`application/json`)
+      request ~> routes ~> check {
+        status should ===(StatusCodes.Created)
 
-      entityAs[String] should ===("""{"description":"CustomerContent(abc,zRE49) added."}""")
+        contentType should ===(ContentTypes.`application/json`)
+
+        entityAs[String] should ===("""{"description":"CustomerContent(xyz,zRE49) added."}""")
+      }
+    }
+
+    "be able to add customerContentIDs (POST /customers)" in {
+      val customer = Customer("123", List("zRE49", "wYqiZ", "15nW5", "srT5k", "FBSxr"))
+      val customerEntity = Marshal(customer).to[MessageEntity].futureValue
+
+      val request = Post("/customers").withEntity(customerEntity)
+
+      request ~> routes ~> check {
+        status should ===(StatusCodes.Created)
+
+        contentType should ===(ContentTypes.`application/json`)
+
+        entityAs[String] should ===("""{"description":"Customer(123,List(zRE49, wYqiZ, 15nW5, srT5k, FBSxr)) added."}""")
+      }
+    }
+
+
+    "be able to get customerContentIDs (GET /customers)" in {
+      val customerID = CustomerID("123")
+      val customerIDEntity = Marshal(customerID).to[MessageEntity].futureValue
+
+      val requestGet = Get("/customers").withEntity(customerIDEntity)
+      requestGet ~> routes ~> check {
+        status should ===(StatusCodes.OK)
+
+        contentType should ===(ContentTypes.`application/json`)
+
+        entityAs[String] should ===("""{"contentIDs":["zRE49","wYqiZ","15nW5","srT5k","FBSxr"]}""")
+      }
+    }
+
+    "be able to remove a customrs contentID (DELETE /customers)" in {
+      val customer = CustomerContent("123", "15nW5")
+      val customerEntity = Marshal(customer).to[MessageEntity].futureValue
+      val request = Delete(uri = "/customers").withEntity(customerEntity)
+
+      request ~> routes ~> check {
+        status should ===(StatusCodes.OK)
+
+        contentType should ===(ContentTypes.`application/json`)
+
+        entityAs[String] should ===("""{"description":"ContentID: 15nW5 deleted."}""")
+      }
+    }
+
+    "be able to get correct customerContentIDs (GET /customers) after delete" in {
+      val customerID = CustomerID("123")
+      val customerIDEntity = Marshal(customerID).to[MessageEntity].futureValue
+
+      val requestGet = Get("/customers").withEntity(customerIDEntity)
+      requestGet ~> routes ~> check {
+        status should ===(StatusCodes.OK)
+
+        contentType should ===(ContentTypes.`application/json`)
+
+        entityAs[String] should ===("""{"contentIDs":["zRE49","wYqiZ","srT5k","FBSxr"]}""")
+      }
+    }
+
+    "be able to add another customers's ContentIDs (POST /customers)" in {
+      val customer = Customer("abc", List("hWjNK", "U8jVg", "GH4pD", "rGIha"))
+      val customerEntity = Marshal(customer).to[MessageEntity].futureValue
+
+      val request = Post("/customers").withEntity(customerEntity)
+      request ~> routes ~> check {
+        status should ===(StatusCodes.Created)
+
+        contentType should ===(ContentTypes.`application/json`)
+
+        entityAs[String] should ===("""{"description":"Customer(abc,List(hWjNK, U8jVg, GH4pD, rGIha)) added."}""")
+      }
+    }
+
+    "be able to get another customer's ContentIDs (GET /customers)" in {
+      val customerID = CustomerID("abc")
+      val customerIDEntity = Marshal(customerID).to[MessageEntity].futureValue
+
+      val requestGet = Get("/customers").withEntity(customerIDEntity)
+      requestGet ~> routes ~> check {
+        status should ===(StatusCodes.OK)
+
+        contentType should ===(ContentTypes.`application/json`)
+
+        entityAs[String] should ===("""{"contentIDs":["hWjNK","U8jVg","GH4pD","rGIha"]}""")
+      }
     }
   }
-
-  "be able to add customerContentIDs (POST /customers)" in {
-    val customer = Customer("123", List("zRE49", "wYqiZ", "srT5k", "FBSxr"))
-    val customerEntity = Marshal(customer).to[MessageEntity].futureValue
-
-    val request = Post("/customers").withEntity(customerEntity)
-    println(request)
-
-    request ~> routes ~> check {
-      status should ===(StatusCodes.Created)
-
-      contentType should ===(ContentTypes.`application/json`)
-
-      entityAs[String] should ===("""{"description":"Customer(123,List(zRE49, wYqiZ, srT5k, FBSxr)) added."}""")
-    }
-  }
-
-  "be able to remove a customrs contentID (DELETE /customers)" in {
-    val customer = CustomerContent("123", "srT5k")
-    val customerEntity = Marshal(customer).to[MessageEntity].futureValue
-    val request = Delete(uri = "/customers").withEntity(customerEntity)
-
-    request ~> routes ~> check {
-      status should ===(StatusCodes.OK)
-
-      // we expect the response to be json:
-      contentType should ===(ContentTypes.`application/json`)
-
-      // and no entries should be in the list:
-      entityAs[String] should ===("""{"description":"ContentID: srT5k deleted."}""")
-    }
-  }
-
-  //need to add test for single customer and content id
 
 
 }
