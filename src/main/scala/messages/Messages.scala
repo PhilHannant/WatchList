@@ -1,5 +1,9 @@
 package messages
 
+/**
+  * Sealed trait containing all the possible messages that can be sent to and by the actor system
+  */
+
 import actors.{Customer, CustomerContent, CustomerID}
 
 sealed trait Messages

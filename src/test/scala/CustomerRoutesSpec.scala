@@ -9,6 +9,10 @@ import system.CustomerRoutes
 
 import scala.concurrent.duration.DurationInt
 
+/**
+  * CustomerRoutesSpec test class
+  */
+
 class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with ScalatestRouteTest
   with CustomerRoutes {
 

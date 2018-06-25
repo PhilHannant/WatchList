@@ -1,7 +1,6 @@
-import java.text.SimpleDateFormat
 
 import actors.{Customer, CustomerContent, CustomerID, CustomerRegisterActor}
-import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import messages.{AddContentID, _}
 import akka.util.Timeout
 import akka.pattern.ask
@@ -9,7 +8,11 @@ import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.concurrent.{Await, ExecutionContext, Future, duration}
+import scala.concurrent.{Await}
+
+/**
+  * CustomerRegisterActorTest used to check functionality of customerRegisterTest
+  */
 
 class CustomerRegisterActorTest extends FlatSpec with Matchers {
 
@@ -24,7 +27,7 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
     val addContent = crActorRef ? AddContentID(CustomerContent("123", "zRE49"))
     val result = Await.result(addContent, timeout.duration)
     println(result)
-    result should be (ActionPerformed(s"Customer zRE49 added."))
+    result should be (ActionPerformed("CustomerContent(123,zRE49) added."))
   }
 
   "addContentID" should "not add duplicates" in {

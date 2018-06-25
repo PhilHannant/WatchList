@@ -1,6 +1,6 @@
 package system
 
-//#quick-start-server
+
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
@@ -11,7 +11,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 
-//#main-class
+/**
+  * HTTP Akka Server
+  */
 object Server extends App with CustomerRoutes {
 
 

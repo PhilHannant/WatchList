@@ -5,6 +5,10 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import messages.{ActionPerformed, CustomerWatchList}
 import spray.json.DefaultJsonProtocol
 
+/**
+  * JsonSupport trait holding details of how Spray JSON will convert case classes used.
+  */
+
 trait JsonSupport extends SprayJsonSupport {
 
   import DefaultJsonProtocol._
