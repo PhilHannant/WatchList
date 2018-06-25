@@ -7,7 +7,6 @@ import messages._
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.util.{Failure, Success, Try}
 
 
 case class Customer(customerID: String, contentIDs: List[String])
@@ -28,11 +27,7 @@ class CustomerRegisterActor extends Actor with ActorLogging {
 
   def receive: Receive = {
     case GetWatchList(customer) =>
-      Try(customers.nonEmpty)
-      match {
-        case Success(s) => sender() ! CustomerWatchList(getCustomerContent(customer.customerID))
-        case Failure(f) => sender() ! CustomerWatchList(List.empty)
-      }
+      sender() ! CustomerWatchList(getWatcListHandler(customer))
     case AddContentID(customerID, contentID) =>
       if(checkCustomer(customerID)){
         val c = customers.find(c => c.customerID == customerID).get
@@ -59,6 +54,11 @@ class CustomerRegisterActor extends Actor with ActorLogging {
         sender() ! ActionPerformed(s"ContentID: ${contentID} deleted.")
       }
       else sender() ! ActionPerformed(s"No $customer content found.")
+  }
+
+  def getWatcListHandler(customer: CustomerID) = {
+    if(customers.nonEmpty && checkCustomer(customer.customerID)) getCustomerContent(customer.customerID)
+    else List.empty
   }
 
   def checkCustomer(customerID: String) = {
