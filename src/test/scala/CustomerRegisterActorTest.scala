@@ -20,11 +20,22 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
 
   val crActorRef: ActorRef = customerRegisterActor
 
-  "addConetent" should "add content for a customer and return an ActionPerformed" in {
+  "addContent" should "add content for a customer and return an ActionPerformed" in {
     val addContent = crActorRef ? AddContentID("123", "zRE49")
     val result = Await.result(addContent, timeout.duration)
     println(result)
     result should be (ActionPerformed(s"Customer zRE49 added."))
+  }
+
+  "addContentID" should "not add duplicates" in {
+    crActorRef ? AddContentID("123", "zRE49")
+    crActorRef ? AddContentID("123", "zRE49")
+    crActorRef ? AddContentID("123", "wYqiZ")
+    crActorRef ? AddContentID("123", "wYqiZ")
+    val watchList = crActorRef ? GetWatchList(CustomerID("123"))
+    val result = Await.result(watchList, timeout.duration)
+    println(result)
+    result should be (CustomerWatchList(List("zRE49", "wYqiZ")))
   }
 
   "getWatchList" should "return a list of watchItems" in {
