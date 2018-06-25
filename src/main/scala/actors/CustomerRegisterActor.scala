@@ -25,6 +25,7 @@ class CustomerRegisterActor extends Actor with ActorLogging {
 
   var customers = new mutable.ListBuffer[Customer]
 
+  //need to handle duplicates, could change to a set
   def receive: Receive = {
     case GetWatchList(customer) =>
       sender() ! CustomerWatchList(getWatcListHandler(customer))
@@ -32,7 +33,7 @@ class CustomerRegisterActor extends Actor with ActorLogging {
       addContentIDHandler(customerID, contentID)
       sender() ! ActionPerformed(s"Customer ${contentID} added.")
     case AddAllContentIDs(customer) =>
-      customers += customer
+      addAllContentIDsHandler(customer)
       sender() ! ActionPerformed(s"Customer ${customer} added.")
     case GetCustomer(customer) =>
       if(checkCustomer(customer.customerID)) sender() ! CustomerWatchList(getCustomerContent(customer.customerID))
@@ -47,8 +48,8 @@ class CustomerRegisterActor extends Actor with ActorLogging {
 
   def addContentIDHandler(customerID: String, contentID: String) = {
     if(checkCustomer(customerID)){
-      val c = customers.find(c => c.customerID == customerID).get
-      val update = c.copy(customerID, c.contentIDs ::: List(contentID))
+      val c = getCustomer(customerID)
+      val update = c.copy(customerID, (c.contentIDs ::: List(contentID)).distinct)
       customers -= customers.find(c => c.customerID == customerID).get
       customers += update
     } else {
@@ -56,9 +57,20 @@ class CustomerRegisterActor extends Actor with ActorLogging {
     }
   }
 
+  def addAllContentIDsHandler(customer: Customer) = {
+    if(checkCustomer(customer.customerID)){
+      val c = getCustomer(customer.customerID)
+      val update = c.copy(customer.customerID, (c.contentIDs ::: customer.contentIDs).distinct)
+      customers -= customers.find(c => c.customerID == customer.customerID).get
+      customers += update
+    } else {
+      customers += Customer(customer.customerID, customer.contentIDs.distinct)
+    }
+  }
+
   def deleteContentHanlder(customerID: String, contentID: String): String = {
     if(customers.map(_.customerID).contains(customerID)) {
-      val c = customers.find(c => c.customerID == customerID).get
+      val c = getCustomer(customerID)
       val remove = c.copy(customerID, c.contentIDs.filter(c => c != contentID))
       customers -= customers.find(c => c.customerID == customerID).get
       customers += remove
@@ -74,6 +86,10 @@ class CustomerRegisterActor extends Actor with ActorLogging {
 
   def getCustomerContent(customerID: String) = {
     customers.find(c => c.customerID == customerID).get.contentIDs
+  }
+
+  def getCustomer(customerID: String) = {
+    customers.find(c => c.customerID == customerID).get
   }
 
 }

@@ -1,8 +1,8 @@
 import java.text.SimpleDateFormat
 
-import actors.{CustomerID, CustomerRegisterActor}
+import actors.{Customer, CustomerID, CustomerRegisterActor}
 import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
-import messages._
+import messages.{AddContentID, _}
 import akka.util.Timeout
 import akka.pattern.ask
 import org.scalatest.{FlatSpec, Matchers}
@@ -50,7 +50,15 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
     val result = Await.result(watchList, timeout.duration)
     println(result)
     result should be (CustomerWatchList(List("zRE49", "wYqiZ", "srT5k", "FBSxr")))
+  }
 
+  "addAllContentIDs" should "not add duplicate contentIDs" in {
+    val customer = Customer("abc", List("zRE49", "wYqiZ", "15nW5", "srT5k", "FBSxr", "zRE49", "wYqiZ", "15nW5"))
+    crActorRef ? AddAllContentIDs(customer)
+    val watchList = crActorRef ? GetWatchList(CustomerID("abc"))
+    val result = Await.result(watchList, timeout.duration)
+    println(result)
+    result should be (CustomerWatchList(List("zRE49", "wYqiZ", "15nW5", "srT5k", "FBSxr")))
   }
 
 }
