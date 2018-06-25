@@ -23,7 +23,6 @@ import akka.util.Timeout
 trait CustomerRoutes extends JsonSupport {
 
 
-
   implicit def system: ActorSystem
 
   lazy val log = Logging(system, classOf[CustomerRoutes])
@@ -62,27 +61,51 @@ trait CustomerRoutes extends JsonSupport {
           )
         },
         pathEnd {
-            concat(
-              get {
+          concat(
+            get {
+              entity(as[CustomerID]) { c =>
+                val customer: Future[CustomerWatchList] =
+                  (customerRegisterActor ? GetWatchList(c)).mapTo[CustomerWatchList]
+                onSuccess(customer) { performed =>
+                  complete((StatusCodes.OK, performed))
+                }
+              }
+            },
+            post {
+              entity(as[CustomerContent]) { customerContent =>
+                val addContentID: Future[ActionPerformed] =
+                  (customerRegisterActor ? AddContentID(customerContent)).mapTo[ActionPerformed]
+                onSuccess(addContentID) { performed =>
+                  log.info("Created customer content [{}]: {}", customerContent, performed.description)
+                  complete((StatusCodes.Created, performed))
+                }
+              }
+            }
+          )
+        },
+        pathEnd {
+          concat(
+            get {
+              entity(as[CustomerID]) { c =>
                 val maybeUser: Future[Option[CustomerWatchList]] =
-                  (customerRegisterActor ? GetUser(pathEnd.toString)).mapTo[Option[CustomerWatchList]]
+                  (customerRegisterActor ? GetCustomer(c)).mapTo[Option[CustomerWatchList]]
                 rejectEmptyResponse {
                   complete(maybeUser)
                 }
-              },
-              delete {
-                entity(as[CustomerContent]) { cc =>
-                  val contentDeleted: Future[ActionPerformed] =
-                    (customerRegisterActor ? DeleteContentID(cc.customerID, cc.contentID)).mapTo[ActionPerformed]
-                  onSuccess(contentDeleted) { performed =>
-                    log.info("Deleted content [{}]: {}", cc, performed.description)
-                    complete((StatusCodes.OK, performed))
-                  }
+              }
+            },
+            delete {
+              entity(as[CustomerContent]) { cc =>
+                val contentDeleted: Future[ActionPerformed] =
+                  (customerRegisterActor ? DeleteContentID(cc.customerID, cc.contentID)).mapTo[ActionPerformed]
+                onSuccess(contentDeleted) { performed =>
+                  log.info("Deleted content [{}]: {}", cc, performed.description)
+                  complete((StatusCodes.OK, performed))
                 }
               }
-            )
+            }
+          )
         }
       )
-
     }
 }

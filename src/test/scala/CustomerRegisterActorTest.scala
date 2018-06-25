@@ -1,6 +1,6 @@
 import java.text.SimpleDateFormat
 
-import actors.{Customer, CustomerID, CustomerRegisterActor}
+import actors.{Customer, CustomerContent, CustomerID, CustomerRegisterActor}
 import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
 import messages.{AddContentID, _}
 import akka.util.Timeout
@@ -21,17 +21,17 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
   val crActorRef: ActorRef = customerRegisterActor
 
   "addContent" should "add content for a customer and return an ActionPerformed" in {
-    val addContent = crActorRef ? AddContentID("123", "zRE49")
+    val addContent = crActorRef ? AddContentID(CustomerContent("123", "zRE49"))
     val result = Await.result(addContent, timeout.duration)
     println(result)
     result should be (ActionPerformed(s"Customer zRE49 added."))
   }
 
   "addContentID" should "not add duplicates" in {
-    crActorRef ? AddContentID("123", "zRE49")
-    crActorRef ? AddContentID("123", "zRE49")
-    crActorRef ? AddContentID("123", "wYqiZ")
-    crActorRef ? AddContentID("123", "wYqiZ")
+    crActorRef ? AddContentID(CustomerContent("123", "zRE49"))
+    crActorRef ? AddContentID(CustomerContent("123", "zRE49"))
+    crActorRef ? AddContentID(CustomerContent("123", "wYqiZ"))
+    crActorRef ? AddContentID(CustomerContent("123", "wYqiZ"))
     val watchList = crActorRef ? GetWatchList(CustomerID("123"))
     val result = Await.result(watchList, timeout.duration)
     println(result)
@@ -39,11 +39,11 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
   }
 
   "getWatchList" should "return a list of watchItems" in {
-    crActorRef ? AddContentID("123", "zRE49")
-    crActorRef ? AddContentID("123", "wYqiZ")
-    crActorRef ? AddContentID("123", "15nW5")
-    crActorRef ? AddContentID("123", "srT5k")
-    crActorRef ? AddContentID("123", "FBSxr")
+    crActorRef ? AddContentID(CustomerContent("123", "zRE49"))
+    crActorRef ? AddContentID(CustomerContent("123", "wYqiZ"))
+    crActorRef ? AddContentID(CustomerContent("123", "15nW5"))
+    crActorRef ? AddContentID(CustomerContent("123", "srT5k"))
+    crActorRef ? AddContentID(CustomerContent("123", "FBSxr"))
     val watchList = crActorRef ? GetWatchList(CustomerID("123"))
     val result = Await.result(watchList, timeout.duration)
     println(result)
@@ -51,11 +51,11 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
   }
 
   "deleteContentID" should "remove a contentId from a customer's watchlist" in {
-    crActorRef ? AddContentID("123", "zRE49")
-    crActorRef ? AddContentID("123", "wYqiZ")
-    crActorRef ? AddContentID("123", "15nW5")
-    crActorRef ? AddContentID("123", "srT5k")
-    crActorRef ? AddContentID("123", "FBSxr")
+    crActorRef ? AddContentID(CustomerContent("123", "zRE49"))
+    crActorRef ? AddContentID(CustomerContent("123", "wYqiZ"))
+    crActorRef ? AddContentID(CustomerContent("123", "15nW5"))
+    crActorRef ? AddContentID(CustomerContent("123", "srT5k"))
+    crActorRef ? AddContentID(CustomerContent("123", "FBSxr"))
     crActorRef ? DeleteContentID("123", "15nW5")
     val watchList = crActorRef ? GetWatchList(CustomerID("123"))
     val result = Await.result(watchList, timeout.duration)

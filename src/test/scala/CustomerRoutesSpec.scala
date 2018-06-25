@@ -1,4 +1,4 @@
-import actors.{Customer, CustomerContent, CustomerRegisterActor, Test}
+import actors.{Customer, CustomerContent, CustomerRegisterActor, CustomerID}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
@@ -35,7 +35,23 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
     }
   }
 
-  "be able to add users (POST /customers)" in {
+  "be able to add customerContentID (POST /customers)" in {
+    val customer = CustomerContent("abc", "zRE49")
+    val customerEntity = Marshal(customer).to[MessageEntity].futureValue
+
+    val request = Post("/customers").withEntity(customerEntity)
+    println(request)
+
+    request ~> routes ~> check {
+      status should ===(StatusCodes.Created)
+
+      contentType should ===(ContentTypes.`application/json`)
+
+      entityAs[String] should ===("""{"description":"CustomerContent(abc,zRE49) added."}""")
+    }
+  }
+
+  "be able to add customerContentIDs (POST /customers)" in {
     val customer = Customer("123", List("zRE49", "wYqiZ", "srT5k", "FBSxr"))
     val customerEntity = Marshal(customer).to[MessageEntity].futureValue
 
@@ -47,7 +63,7 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
 
       contentType should ===(ContentTypes.`application/json`)
 
-      entityAs[String] should ===("""{"description":"Customer Customer(123,List(zRE49, wYqiZ, srT5k, FBSxr)) added."}""")
+      entityAs[String] should ===("""{"description":"Customer(123,List(zRE49, wYqiZ, srT5k, FBSxr)) added."}""")
     }
   }
 
@@ -66,6 +82,8 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
       entityAs[String] should ===("""{"description":"ContentID: srT5k deleted."}""")
     }
   }
+
+  //need to add test for single customer and content id
 
 
 }

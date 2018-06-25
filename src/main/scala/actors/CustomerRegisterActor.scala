@@ -21,20 +21,17 @@ object CustomerRegisterActor {
 
 class CustomerRegisterActor extends Actor with ActorLogging {
 
-
-
   var customers = new mutable.ListBuffer[Customer]
 
-  //need to handle duplicates, could change to a set
   def receive: Receive = {
     case GetWatchList(customer) =>
       sender() ! CustomerWatchList(getWatcListHandler(customer))
-    case AddContentID(customerID, contentID) =>
-      addContentIDHandler(customerID, contentID)
-      sender() ! ActionPerformed(s"Customer ${contentID} added.")
+    case AddContentID(customerContent) =>
+      addContentIDHandler(customerContent.customerID, customerContent.contentID)
+      sender() ! ActionPerformed(s"${customerContent} added.")
     case AddAllContentIDs(customer) =>
       addAllContentIDsHandler(customer)
-      sender() ! ActionPerformed(s"Customer ${customer} added.")
+      sender() ! ActionPerformed(s"${customer} added.")
     case GetCustomer(customer) =>
       if(checkCustomer(customer.customerID)) sender() ! CustomerWatchList(getCustomerContent(customer.customerID))
     case DeleteContentID(customerID, contentID) =>
