@@ -28,24 +28,24 @@ class CustomerRegisterActor extends Actor with ActorLogging {
   def receive: Receive = {
     case GetWatchList(customer) =>
       println(customer.customerID)
-      if(customers.isEmpty){ println("empty"); sender() ! CustomerWatchList(List.empty)}
-      else sender() ! CustomerWatchList(customers.find(c => c.customerID == customer.customerID).get.contentIDs)
-    case AddContentID(customer, contentID) =>
-      if(customers.map(_.customerID).contains(customer)){
-        val c = customers.find(c => c.customerID == customer).get
-        val update = c.copy(customer, c.contentIDs ::: List(contentID))
-        customers -= customers.find(c => c.customerID == customer).get
+      if(customers.isEmpty) sender() ! CustomerWatchList(List.empty)
+      else sender() ! CustomerWatchList(getCustomerContent(customer.customerID))
+    case AddContentID(customerID, contentID) =>
+      if(checkCustomer(customerID)){
+        val c = customers.find(c => c.customerID == customerID).get
+        val update = c.copy(customerID, c.contentIDs ::: List(contentID))
+        customers -= customers.find(c => c.customerID == customerID).get
         customers += update
       } else {
-        customers += Customer(customer, List(contentID))
+        customers += Customer(customerID, List(contentID))
       }
       sender() ! ActionPerformed(s"Customer ${contentID} added.")
     case AddAllContentIDs(customer) =>
       customers += customer
-      println(customers.toList)
       sender() ! ActionPerformed(s"Customer ${customer} added.")
-    case GetUser(customer) =>
-      sender() ! customers.find(_ == customer)
+    case GetCustomer(customer) =>
+      println("GetCustomer")
+      if(checkCustomer(customer.customerID)) sender() ! CustomerWatchList(getCustomerContent(customer.customerID))
     case DeleteContentID(customer, contentID) =>
       if(customers.map(_.customerID).contains(customer)) {
         val c = customers.find(c => c.customerID == customer).get
@@ -58,7 +58,13 @@ class CustomerRegisterActor extends Actor with ActorLogging {
       else sender() ! ActionPerformed(s"No $customer content found.")
   }
 
-  def checkCustomer(customerID: String) = ???
+  def checkCustomer(customerID: String) = {
+    if(customers.map(_.customerID).contains(customerID)) true
+    else false
+  }
 
+  def getCustomerContent(customerID: String) = {
+    customers.find(c => c.customerID == customerID).get.contentIDs
+  }
 }
 
