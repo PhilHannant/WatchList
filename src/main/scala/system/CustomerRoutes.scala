@@ -1,6 +1,6 @@
 package system
 
-import actors.{Customer, CustomerContent}
+import actors.{Customer, CustomerContent, CustomerID}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.event.Logging
 
@@ -41,9 +41,9 @@ trait CustomerRoutes extends JsonSupport {
         pathEnd {
           concat(
             get {
-              entity(as[Customer]) { c =>
+              entity(as[CustomerID]) { c =>
                 val customer: Future[CustomerWatchList] =
-                  (customerRegisterActor ? GetWatchList(c.customerID)).mapTo[CustomerWatchList]
+                  (customerRegisterActor ? GetWatchList(c)).mapTo[CustomerWatchList]
                 onSuccess(customer) { performed =>
                   complete((StatusCodes.OK, performed))
                 }

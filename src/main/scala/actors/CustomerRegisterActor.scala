@@ -11,6 +11,7 @@ import scala.collection.mutable.ListBuffer
 
 case class Customer(customerID: String, contentIDs: List[String])
 case class CustomerContent(customerID: String, contentID: String)
+case class CustomerID(customerID: String)
 
 
 
@@ -26,9 +27,9 @@ class CustomerRegisterActor extends Actor with ActorLogging {
 
   def receive: Receive = {
     case GetWatchList(customer) =>
-      println(customer)
+      println(customer.customerID)
       if(customers.isEmpty){ println("empty"); sender() ! CustomerWatchList(List.empty)}
-      else sender() ! CustomerWatchList(customers.find(c => c.customerID == customer).get.contentIDs)
+      else sender() ! CustomerWatchList(customers.find(c => c.customerID == customer.customerID).get.contentIDs)
     case AddContentID(customer, contentID) =>
       if(customers.map(_.customerID).contains(customer)){
         val c = customers.find(c => c.customerID == customer).get
@@ -57,6 +58,7 @@ class CustomerRegisterActor extends Actor with ActorLogging {
       else sender() ! ActionPerformed(s"No $customer content found.")
   }
 
+  def checkCustomer(customerID: String) = ???
 
 }
 

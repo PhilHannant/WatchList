@@ -1,6 +1,6 @@
 package system
 
-import actors.{Customer, CustomerContent}
+import actors.{Customer, CustomerContent, CustomerID}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import messages.{ActionPerformed, CustomerWatchList}
 import spray.json.DefaultJsonProtocol
@@ -11,6 +11,8 @@ trait JsonSupport extends SprayJsonSupport {
 
 
   implicit val customersJsonFormat = jsonFormat2(Customer)
+
+  implicit val customerIDJsonFormat = jsonFormat1(CustomerID)
 
   implicit val customerContentJsonFormat = jsonFormat2(CustomerContent)
 

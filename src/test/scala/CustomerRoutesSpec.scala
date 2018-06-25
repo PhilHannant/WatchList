@@ -1,4 +1,4 @@
-import actors.{Customer, CustomerContent, CustomerRegisterActor}
+import actors.{Customer, CustomerContent, CustomerRegisterActor, Test}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
@@ -21,7 +21,7 @@ class CustomerRoutesSpec extends WordSpec with Matchers with ScalaFutures with S
 
   "CustomerRoutes" should {
     "return no content if no present (GET /customers)" in {
-      val customer = Customer("123", List())
+      val customer = CustomerID("123")
       val customerEntity = Marshal(customer).to[MessageEntity].futureValue
       val request = HttpRequest(uri = "/customers").withEntity(customerEntity)
 
