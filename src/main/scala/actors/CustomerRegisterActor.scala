@@ -35,7 +35,9 @@ object CustomerRegisterActor {
 }
 
 /**
-  * CustomerRegisterActor
+  * CustomerRegisterActor built on the assumption that the customerID and contentID will be in the correct format. If
+  * a customer is not present an empty list is returned. Duplicate contentIDs are not permitted and if a contentID is
+  * attempted to be removed that doesn't exist the customer's watchList will remoain the same.
   */
 class CustomerRegisterActor extends Actor with ActorLogging {
 
@@ -55,8 +57,6 @@ class CustomerRegisterActor extends Actor with ActorLogging {
     case AddAllContentIDs(customer) =>
       addAllContentIDsHandler(customer)
       sender() ! ActionPerformed(s"${customer} added.")
-    case GetCustomer(customer) =>
-      if(checkCustomer(customer.customerID)) sender() ! CustomerWatchList(getCustomerContent(customer.customerID))
     case DeleteContentID(customerID, contentID) =>
       sender() ! ActionPerformed(deleteContentHandler(customerID, contentID))
   }
