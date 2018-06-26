@@ -12,7 +12,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 
 /**
-  * HTTP Akka Server
+  * HTTP Akka Server based on the Akka http quick start server
   */
 object Server extends App with CustomerRoutes {
 
