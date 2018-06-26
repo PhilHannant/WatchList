@@ -6,7 +6,7 @@ The Watchlist service should be implemented as an API. A single watchlist item i
 alphanumeric string (called a contentID) that is unique to a specific asset. The client teams will send
 contentIDs to the new Watchlist service
 
-Once the server is running the following curl commands can be used from a terminal supporting curl
+Once the server is running the following commands can be used in a shell that supports cURL
 
 <strong>Get</strong> - will return a watchlist containing contentIDs or an empty list if customer does not exist or has not contentIDs<br>
 
