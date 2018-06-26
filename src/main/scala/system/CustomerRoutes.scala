@@ -87,27 +87,16 @@ trait CustomerRoutes extends JsonSupport {
           )
         },
         pathEnd {
-          concat(
-            get {
-              entity(as[CustomerID]) { c =>
-                val maybeUser: Future[Option[CustomerWatchList]] =
-                  (customerRegisterActor ? GetCustomer(c)).mapTo[Option[CustomerWatchList]]
-                rejectEmptyResponse {
-                  complete(maybeUser)
-                }
-              }
-            },
-            delete {
-              entity(as[CustomerContent]) { cc =>
-                val contentDeleted: Future[ActionPerformed] =
-                  (customerRegisterActor ? DeleteContentID(cc.customerID, cc.contentID)).mapTo[ActionPerformed]
-                onSuccess(contentDeleted) { performed =>
-                  log.info("Deleted content [{}]: {}", cc, performed.description)
-                  complete((StatusCodes.OK, performed))
-                }
+          delete {
+            entity(as[CustomerContent]) { cc =>
+              val contentDeleted: Future[ActionPerformed] =
+                (customerRegisterActor ? DeleteContentID(cc.customerID, cc.contentID)).mapTo[ActionPerformed]
+              onSuccess(contentDeleted) { performed =>
+                log.info("Deleted content [{}]: {}", cc, performed.description)
+                complete((StatusCodes.OK, performed))
               }
             }
-          )
+          }
         }
       )
     }
