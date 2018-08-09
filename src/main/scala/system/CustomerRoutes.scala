@@ -60,19 +60,6 @@ trait CustomerRoutes extends JsonSupport {
                   complete((StatusCodes.Created, performed))
                 }
               }
-            }
-          )
-        },
-        pathEnd {
-          concat(
-            get {
-              entity(as[CustomerID]) { c =>
-                val customer: Future[CustomerWatchList] =
-                  (customerRegisterActor ? GetWatchList(c)).mapTo[CustomerWatchList]
-                onSuccess(customer) { performed =>
-                  complete((StatusCodes.OK, performed))
-                }
-              }
             },
             post {
               entity(as[CustomerContent]) { customerContent =>
@@ -83,20 +70,18 @@ trait CustomerRoutes extends JsonSupport {
                   complete((StatusCodes.Created, performed))
                 }
               }
-            }
-          )
-        },
-        pathEnd {
-          delete {
-            entity(as[CustomerContent]) { cc =>
-              val contentDeleted: Future[ActionPerformed] =
-                (customerRegisterActor ? DeleteContentID(cc.customerID, cc.contentID)).mapTo[ActionPerformed]
-              onSuccess(contentDeleted) { performed =>
-                log.info("Deleted content [{}]: {}", cc, performed.description)
-                complete((StatusCodes.OK, performed))
+            },
+            delete {
+              entity(as[CustomerContent]) { cc =>
+                val contentDeleted: Future[ActionPerformed] =
+                  (customerRegisterActor ? DeleteContentID(cc.customerID, cc.contentID)).mapTo[ActionPerformed]
+                onSuccess(contentDeleted) { performed =>
+                  log.info("Deleted content [{}]: {}", cc, performed.description)
+                  complete((StatusCodes.OK, performed))
+                }
               }
             }
-          }
+          )
         }
       )
     }

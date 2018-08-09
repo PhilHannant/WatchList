@@ -11,7 +11,7 @@ import scala.collection.mutable
   * @param contentIDs
   */
 
-case class Customer(customerID: String, contentIDs: List[String])
+case class Customer(customerID: String, contentIDs: List[String], HouseholdID: String = "32Tre")
 
 /**
   * CustomerContent case class to hold key vlaue pair between customrID and contentID
@@ -32,7 +32,10 @@ case class CustomerID(customerID: String)
 
 object CustomerRegisterActor {
   def props: Props = Props[CustomerRegisterActor]
+
 }
+
+
 
 /**
   * CustomerRegisterActor built on the assumption that the customerID and contentID will be in the correct format. If
@@ -51,6 +54,8 @@ class CustomerRegisterActor extends Actor with ActorLogging {
   def receive: Receive = {
     case GetWatchList(customer) =>
       sender() ! CustomerWatchList(getWatcListHandler(customer))
+    case GetHouseHoldLists(customer) =>
+      sender() ! HouseholdWatchLists(getHouseholdWatchList(customer))
     case AddContentID(customerContent) =>
       addContentIDHandler(customerContent.customerID, customerContent.contentID)
       sender() ! ActionPerformed(s"${customerContent} added.")
@@ -98,11 +103,11 @@ class CustomerRegisterActor extends Actor with ActorLogging {
   def addAllContentIDsHandler(customer: Customer) = {
     if(checkCustomer(customer.customerID)){
       val c = getCustomer(customer.customerID)
-      val update = c.copy(customer.customerID, (c.contentIDs ::: customer.contentIDs).distinct)
+      val update = c.copy(customer.customerID, (c.contentIDs ::: customer.contentIDs).distinct, customer.HouseholdID)
       customers -= customers.find(c => c.customerID == customer.customerID).get
       customers += update
     } else {
-      customers += Customer(customer.customerID, customer.contentIDs.distinct)
+      customers += Customer(customer.customerID, customer.contentIDs.distinct, customer.HouseholdID)
     }
   }
 
@@ -153,6 +158,12 @@ class CustomerRegisterActor extends Actor with ActorLogging {
   def getCustomer(customerID: String) = {
     customers.find(c => c.customerID == customerID).get
   }
+
+  def getHouseholdWatchList(customer: Customer) = {
+    println(customers)
+    customers.filter(c => c.HouseholdID == customer.HouseholdID).map(_.contentIDs).toList
+  }
+
 
 }
 

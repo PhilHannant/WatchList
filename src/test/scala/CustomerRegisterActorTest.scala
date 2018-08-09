@@ -75,4 +75,18 @@ class CustomerRegisterActorTest extends FlatSpec with Matchers {
     result should be (CustomerWatchList(List("zRE49", "wYqiZ", "15nW5", "srT5k", "FBSxr")))
   }
 
+  "getHouseholdLists" should "return a list of contentId lists" in {
+    val customer1 = Customer("xyz", List("zRE49", "wYqiZ", "15nW5", "srT5k"), "house1")
+    val customer2 = Customer("ef1", List("FBSxr", "zRE49", "wYqiZ", "15nW5"), "house1")
+    val customer3 = Customer("wej", List("zRE49", "wYqiZ", "15nW5", "srT5k", "FBSxr", "zRE49", "wYqiZ", "15nW5"), "house2")
+    crActorRef ? AddAllContentIDs(customer1)
+    crActorRef ? AddAllContentIDs(customer2)
+    crActorRef ? AddAllContentIDs(customer3)
+    val householdList = crActorRef ? GetHouseHoldLists(customer2)
+    val result = Await.result(householdList, timeout.duration)
+    println(result)
+    result should be (HouseholdWatchLists(List(List("zRE49", "wYqiZ", "15nW5", "srT5k"),
+      List("FBSxr", "zRE49", "wYqiZ", "15nW5"))))
+  }
+
 }

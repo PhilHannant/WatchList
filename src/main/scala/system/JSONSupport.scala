@@ -14,7 +14,7 @@ trait JsonSupport extends SprayJsonSupport {
   import DefaultJsonProtocol._
 
 
-  implicit val customersJsonFormat = jsonFormat2(Customer)
+  implicit val customersJsonFormat = jsonFormat3(Customer)
 
   implicit val customerIDJsonFormat = jsonFormat1(CustomerID)
 
