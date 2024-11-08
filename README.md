@@ -1,6 +1,6 @@
 # WatchList
 
-Implementation of a WatchList service using Akka Http
+Implementation of a WatchList service using Akka Http 
 
 The Watchlist service should be implemented as an API. A single watchlist item is represented by a 5 digit
 alphanumeric string (called a contentID) that is unique to a specific asset. The client teams will send
